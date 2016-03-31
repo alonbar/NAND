@@ -12,7 +12,11 @@ class CodeWriter:
     LT = "lt"
     logic_table = {EQ : "JEQ", GT : "JGT", LT : "JLT"}
     binary_table = {"add": "+", "sub" : "-", "eq" : "=", "and": "&", "or" : "|"}
+    segment_table = {"local" : "LCL", "arguement" : "ARG", "this": "THIS", "that" : "THAT"}
     label_counter = 0
+
+    def __init__(self, program_name_):
+        self._program_name = program_name_
 
     def write_line(self, line):
          if self.PUSH == line[0]:
@@ -32,16 +36,42 @@ class CodeWriter:
     def get_push_line(self, memory_segment_, value_):
         if memory_segment_ == self.CONSTANT:
             return self.get_push_constant(value_)
+        else:
+            return self.
+
+    def get_pop_value(self):
+        ret_line = [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M"]
+        return ret_line
 
     def get_push_constant(self, value_):
-        ret_line = []
-        ret_line += [self.ADDRESS_SIGN + value_]
-        ret_line += ["D = A"]
-        ret_line += [self.ADDRESS_SIGN + self.SP]
-        ret_line += ["A = M"]
-        ret_line += ["M = D"]
+        ret_line = [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
         ret_line += self.increase_SP()
         return ret_line
+
+    def get_push_segment(self, segment_, value_):
+        ret_line = []
+        if segment_ in self.segment_table:
+            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + segment_, "A = D + M", "D = M", \
+                        self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+            ret_line += self.increase_SP()
+            return  ret_line
+        elif segment_ == "pointer":
+            #determining if it is @THIS or @THAT
+            if int(value_) == 0:
+                ret_line += [self.ADDRESS_SIGN + "THIS"]
+            else:
+                ret_line += [self.ADDRESS_SIGN + "THAT"]
+            ret_line += ["D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+            ret_line += self.increase_SP()
+            return  ret_line
+        elif segment_ == "static":
+            ret_line = ["@" + self._program_name + "." + value_]
+            ret_line += ["D = A", "@R15", "M = D", "A = M", "D = M"]
+            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M", "M = D", "D = A + 1", "@SP", "M = D"]
+            return  ret_line
+
+
+
 
 
     def increase_SP(self):

@@ -8,7 +8,7 @@ if __name__ == "__main__":
         file_list = os.listdir(sys.argv[1])
         for file in file_list:
             if str(file).endswith(".vm") == True:
-                writer = CodeWriter.CodeWriter()
+                writer = CodeWriter.CodeWriter(file[:-3])
                 parser = Parser.Parser(sys.argv[1]+ file, writer)
                 parser.parse_vm()
 
