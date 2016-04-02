@@ -1,0 +1,16 @@
+alonba, joshm
+===============================================================================
+Alon Bar, ID 201639663, alon.bar2@mail.huji.ac.il
+Josh Mirchin, ID 318142999, josh.mirchin@mail.huji.ac.il
+===============================================================================
+
+                           Project 06 - Assembler
+                           ----------------------- 
+Submitted Files
+---------------
+README 					This file.
+Assemble.py				The entry point to the program
+Parser.py 				The module that will manager the assembing process.
+Code.py					Contains the dictionaries that will translate asselmbly to machine code.
+Makefile				Makefile
+Memoery.hdl				implementation of Memoery chip according to the textbook.

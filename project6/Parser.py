@@ -1,18 +1,21 @@
 import sys
 import os
 import Code
+#This class parse all ".asm" files. it will read the files line by line and will retreive the correct machine code from
+#Code class
 class Parser:
     ADDRESS_PREFIX = "@"
     LABEL_PREFIX = "("
     EQUAL_CHAR = '='
     JUMP_CHAR = ';'
+    #Will contain all symbols
     symbol_table = {}
     VAR_START_ADDRESS = 16
     def __init__(self, root_name):
         self.root_name = root_name
 
-
     def parse(self):
+        #Checking whether the path is a file or directory
         if os.path.isfile(self.root_name):
             self.parse_file(self.root_name)
         elif os.path.isdir(self.root_name):
@@ -21,13 +24,14 @@ class Parser:
             for file in files_list:
                 if file.endswith(".asm") and os.path.isfile(self.root_name + "/" + file):
                     self.parse_file(self.root_name + "/" + file)
-
+    #parsing a single file
     def parse_file(self, file_name):
-        print(file_name)
         with open(file_name, "r") as f:
+            #reading the lines while ignoring whitespaces and comments
             lines = [line.replace(' ','').strip() for line in f if line.replace(' ','').strip() and line[0] != '/']
             counter = 0
             for line in lines:
+                #ignoring comments at the end of the line
                 if '/' in line:
                     lines[counter] = line[0:line.index('/')]
                 counter += 1
@@ -38,13 +42,11 @@ class Parser:
         ji = 0
         #parsing file
         for line in lines:
-            if ji == 76:
-                print("stop")
-            #it is a C_COMMAND
             c_command = ""
             a_command = ""
             binary_command = ""
             if line[0] == self.ADDRESS_PREFIX:
+                #it is a Address command
                 symbol = line[1:]
                 address = 0
                 if symbol[0].isdigit():
@@ -59,14 +61,13 @@ class Parser:
                 binary_address = format(address, '016b')
                 output_file.write(binary_address + "\n")
             elif line[0] != self.ADDRESS_PREFIX and line[0] != self.LABEL_PREFIX:
+            #it is a C_COMMAND
                 c_command = self.parse_c_command(line)
                 output_file.write(c_command + "\n")
-            ji += 1
-        output_file.write("diff6" + "\n")
         output_file.close()
 
-
     def create_symbol_table(self, lines):
+        #intializing and creating symbol table
         symbols_table = {}
         symbols_table["SP"] = 0
         symbols_table["LCL"] = 1
@@ -105,7 +106,6 @@ class Parser:
             if self.JUMP_CHAR in comp_str:
                 comp_str = comp_str[0:comp_str.index(self.JUMP_CHAR)]
             return comp_str
-
         if self.JUMP_CHAR in c_command:
             comp_str = c_command[0:c_command.index(self.JUMP_CHAR)]
         return comp_str
@@ -117,6 +117,7 @@ class Parser:
         return jump_str
 
     def build_binary_command(self, dest_str, comp_str, jump_str):
+        #getting the correct machine code
         code = Code.Code(dest_str, comp_str, jump_str)
         dest_code = code.get_dest_code()
         comp_code = code.get_comp_code()
