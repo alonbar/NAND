@@ -14,44 +14,13 @@ class CodeWriter:
     binary_table = {"add": "+", "sub" : "-", "eq" : "=", "and": "&", "or" : "|"}
     segment_table = {"local" : "LCL", "argument" : "ARG", "this": "THIS", "that" : "THAT"}
     label_counter = 0
-    _function_counter = 0
+
     def __init__(self):
         self._program_name = ""
 
     def set_program_name(self,program_name_):
         self._program_name = program_name_
 
-    def write_bootstrap(self):
-        ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]
-        ret_lines += self.get_call_line('Sys.init', str(0))
-        return  ret_lines
-
-    def get_call_line(self, function_name_, parameter_):
-        #pushing return address
-        add_return = "address_return_"
-        ret_lines = [self.ADDRESS_SIGN + add_return+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
-                     "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting LCL base address
-        ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting ARG base address
-        ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting THIS base address
-        ret_lines += [self.ADDRESS_SIGN + "THIS", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting THAT base address
-        ret_lines += [self.ADDRESS_SIGN + "THAT", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting ARG=SP-n-5 base address
-        ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", \
-                      self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
-                      self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "LCL", "M = D"]
-        #setting go to f
-        ret_lines += [self.ADDRESS_SIGN + function_name_, "0;JMP", "(" + add_return+ str(self._function_counter) + ")"]
-        self._function_counter +=1
-        return ret_lines
 
     def write_line(self, line):
          if self.PUSH == line[0]:
@@ -66,58 +35,7 @@ class CodeWriter:
              return self.get_logic_line(line[0])
          elif line[0] in self.binary_table:
              return self.get_arithmatic_binary_operator(line[0])
-         elif line[0] == "label":
-             return self.get_label_line(line[1])
-         elif "if-goto" in line[0]:
-             return self.get_if_line(line[1])
-         elif "goto" in line[0]:
-             return self.get_goto_line(line[1])
-         elif "function" in line[0]:
-             return self.get_function_line(line[1], line[2])
-         elif "call" in line[0]:
-             return self.get_call_line(line[1], line[2])
-         elif "return" in line[0]:
-             return  self.get_return_line()
 
-
-    def get_return_line(self):
-        ret_lines =[self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + "R14", "M = D"]
-        ret_lines += [self.ADDRESS_SIGN + "5", "D = D - A", "A = D", "D = M", self.ADDRESS_SIGN + "R15", "M = D"]
-        ret_lines += self.get_pop_value("argument", str(0))
-        ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "M = D + 1", self.ADDRESS_SIGN + "R14", "D = M - 1",\
-                      "A = D", "D = M", self.ADDRESS_SIGN + "THAT", "M = D"]
-
-        ret_lines += [self.ADDRESS_SIGN + "2", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "THIS",\
-                      "M = D"]
-
-        ret_lines += [self.ADDRESS_SIGN + "3", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "ARG",\
-                      "M = D"]
-
-        ret_lines += [self.ADDRESS_SIGN + "3", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "LCL",\
-                      "M = D"]
-
-        ret_lines += [self.ADDRESS_SIGN + "R15", "A = M", "0;JMP"]
-
-        return  ret_lines
-
-    def get_function_line(self, function_name_, parameter_):
-        self._program_name = function_name_
-        ret_lines = ["(" + self._program_name + ")", self.ADDRESS_SIGN + self.SP, ]
-        for i in range(int(parameter_)):
-            ret_lines += [self.ADDRESS_SIGN + parameter_, "D = A"]
-            ret_lines += [self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-            ret_lines += self.increase_SP()
-        return ret_lines
-
-    def get_if_line(self, value_):
-        return [self.ADDRESS_SIGN + self.SP, "M = M - 1", "A = M", "D = M", \
-                self.ADDRESS_SIGN + self._program_name + "::" + value_, "D;JNE"]
-
-    def get_goto_line(self, value_):
-        return [self.ADDRESS_SIGN + self._program_name + "::" + value_, "0:jmp"]
-
-    def get_label_line(self, value_):
-        return ["(" + self._program_name + "::" + value_ + ")"]
 
     def get_push_line(self, memory_segment_, value_):
         if memory_segment_ == self.CONSTANT:
