@@ -15,8 +15,12 @@ class CodeWriter:
     segment_table = {"local" : "LCL", "argument" : "ARG", "this": "THIS", "that" : "THAT"}
     label_counter = 0
 
-    def __init__(self, program_name_):
+    def __init__(self):
+        self._program_name = ""
+
+    def set_program_name(self,program_name_):
         self._program_name = program_name_
+
 
     def write_line(self, line):
          if self.PUSH == line[0]:
@@ -73,7 +77,7 @@ class CodeWriter:
     def get_push_segment(self, segment_, value_):
         ret_line = []
         if segment_ in self.segment_table:
-            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "A = D + M","A = M" ,"D = M", \
+            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "A = D + M","A = M" ,"D = A", \
                         self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
             ret_line += self.increase_SP()
             return  ret_line
