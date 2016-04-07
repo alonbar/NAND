@@ -1,199 +1,207 @@
 @256
 D = A
-@SP
+@0
 M = D
-@address_return_0
+@RETURN_ADD0
 D = A
 @SP
 A = M
 M = D
 @SP
-M = M + 1
+ M = M + 1
 @LCL
 D = M
 @SP
 A = M
 M = D
 @SP
-M = M + 1
+ M = M + 1
 @ARG
 D = M
 @SP
 A = M
 M = D
 @SP
-M = M + 1
+ M = M + 1
 @THIS
 D = M
 @SP
 A = M
 M = D
 @SP
-M = M + 1
+ M = M + 1
 @THAT
 D = M
 @SP
 A = M
 M = D
 @SP
-M = M + 1
+ M = M + 1
 @SP
 D = M
-@0
-D = D - A
+@LCL
+M = D
+@LCL
+D = M
 @5
 D = D - A
 @ARG
 M = D
-@SP
-D = M
-@LCL
-M = D
 @Sys.init
 0;JMP
-(address_return_0)
+(RETURN_ADD0)
 (SimpleFunction.test)
-@SP
-@2
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@2
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
 @0
 D = A
-@LCL
-A = D + M
+@SP
 A = M
+M = D
+D = A + 1
+@SP
+M = D
+@0
 D = A
 @SP
 A = M
 M = D
+D = A + 1
 @SP
-M = M + 1
+M = D
+@LCL
+D = M
+@0
+D = D + A
+@R14
+M = D
+A = M
+D = M
+@SP
+A = M
+M = D
+D = A + 1
+@SP
+M = D
+@LCL
+D = M
 @1
-D = A
-@LCL
-A = D + M
+D = D + A
+@R14
+M = D
 A = M
-D = A
+D = M
 @SP
 A = M
 M = D
+D = A + 1
 @SP
-M = M + 1
+M = D
 @SP
 A = M - 1
 D = M
 A = A - 1
-M = M + D
+M = D + M
+D = A + 1
 @SP
-M = M - 1
+M = D
 @SP
 A = M - 1
 M = !M
-@0
-D = A
 @ARG
-A = D + M
+D = M
+@0
+D = D + A
+@R14
+M = D
 A = M
-D = A
+D = M
 @SP
 A = M
 M = D
+D = A + 1
 @SP
-M = M + 1
+M = D
 @SP
 A = M - 1
 D = M
 A = A - 1
-M = M + D
+M = D + M
+D = A + 1
 @SP
-M = M - 1
-@1
-D = A
+M = D
 @ARG
-A = D + M
+D = M
+@1
+D = D + A
+@R14
+M = D
 A = M
-D = A
+D = M
 @SP
 A = M
 M = D
+D = A + 1
 @SP
-M = M + 1
+M = D
 @SP
 A = M - 1
 D = M
 A = A - 1
 M = M - D
+D = A + 1
 @SP
-M = M - 1
+M = D
 @LCL
 D = M
-@R14
-M = D
 @5
-D = D - A
-A = D
+A = D - A
 D = M
-@R15
-M = D
-@0
-D = A
-@ARG
-D = D + M
-@R15
+@R14
 M = D
 @SP
 A = M - 1
 D = M
-@R15
+@ARG
 A = M
 M = D
-@SP
-M = M - 1
 @ARG
 D = M
 @SP
 M = D + 1
-@R14
-D = M - 1
-A = D
+@LCL
 D = M
-@THAT
+@4
+D = D - A
+@R13
 M = D
-@2
-D = A
-@R14
-D = M - D
-A = D
-D = M
-@THIS
-M = D
-@3
-D = A
-@R14
-D = M - D
-A = D
-D = M
-@ARG
-M = D
-@3
-D = A
-@R14
-D = M - D
-A = D
+@R13
+A = M
 D = M
 @LCL
 M = D
-@R15
+@R13
+M = M + 1
+@R13
+A = M
+D = M
+@ARG
+M = D
+@R13
+M = M + 1
+@R13
+A = M
+D = M
+@THIS
+M = D
+@R13
+M = M + 1
+@R13
+A = M
+D = M
+@THAT
+M = D
+@R13
+M = M + 1
+
+@R14
 A = M
 0;JMP

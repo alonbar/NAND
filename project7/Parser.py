@@ -35,12 +35,12 @@ class Parser:
                     self.parse_vm("/" + file, output_file)
 
         else:
-            output_file_path = self._input_file_path.replace(".vm", ".asm")
+            output_file_path = self._input_file_path.replace(".vm", "_us.asm")
             output_file = open(output_file_path, "w")
             asm_lines = self._writer.write_bootstrap()
             for asm_line in asm_lines:
                 output_file.write(asm_line + "\n")
-            self._writer.set_program_name(os.path.basename(os.path.normpath(self._input_file_path))[:-3])
+            # self._writer.set_program_name(os.path.basename(os.path.normpath(self._input_file_path))[:-3])
             self.parse_vm("", output_file)
         output_file.close()
 

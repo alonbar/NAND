@@ -16,42 +16,79 @@ class CodeWriter:
     label_counter = 0
     _function_counter = 0
     def __init__(self):
-        self._program_name = ""
+        self._program_name = "Sys.init"
+        self._vm_name = ""
 
     def set_program_name(self,program_name_):
-        self._program_name = program_name_
+        self._vm_name = program_name_
 
     def write_bootstrap(self):
         ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]
+        # self._program_name = "Sys.init"
         ret_lines += self.get_call_line('Sys.init', str(0))
         return  ret_lines
 
     def get_call_line(self, function_name_, parameter_):
-        #pushing return address
-        add_return = "address_return_"
-        ret_lines = [self.ADDRESS_SIGN + add_return+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
-                     "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting LCL base address
-        ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting ARG base address
-        ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting THIS base address
-        ret_lines += [self.ADDRESS_SIGN + "THIS", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting THAT base address
-        ret_lines += [self.ADDRESS_SIGN + "THAT", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        ret_lines += self.increase_SP()
-        #setting ARG=SP-n-5 base address
-        ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", \
-                      self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
-                      self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "LCL", "M = D"]
-        #setting go to f
-        ret_lines += [self.ADDRESS_SIGN + function_name_, "0;JMP", "(" + add_return+ str(self._function_counter) + ")"]
-        self._function_counter +=1
-        return ret_lines
+        # #pushing return address
+        # add_return = "address_return_"
+        # ret_lines = [self.ADDRESS_SIGN + add_return+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
+        #              "A = M", "M = D"]
+        # ret_lines += self.increase_SP()
+        # #setting LCL base address
+        # ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        # ret_lines += self.increase_SP()
+        # #setting ARG base address
+        # ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        # ret_lines += self.increase_SP()
+        # #setting THIS base address
+        # ret_lines += [self.ADDRESS_SIGN + "THIS", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        # ret_lines += self.increase_SP()
+        # #setting THAT base address
+        # ret_lines += [self.ADDRESS_SIGN + "THAT", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        # ret_lines += self.increase_SP()
+        # #setting ARG=SP-n-5 base address
+        # ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", \
+        #               self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
+        #               self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "LCL", "M = D"]
+        # #setting go to f
+        # ret_lines += ["@ARG", "D = M", self.ADDRESS_SIGN + function_name_, "0;JMP", "(" + add_return+ str(self._function_counter) + ")"]
+        # self._function_counter +=1
+        # return ret_lines
+
+        ###from lior####
+          lines_to_return = []
+
+        # PUSH RETURN ADDRESS
+          lines_to_return += ["@RETURN_ADD" + str(self._function_counter), "D = A", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
+
+        # PUSH LCL
+          lines_to_return += ["@LCL", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
+
+        # PUSH ARG
+          lines_to_return += ["@ARG", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
+
+        # PUSH THIS
+          lines_to_return += ["@THIS", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
+
+        # PUSH THAT
+          lines_to_return += ["@THAT", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
+
+        # SET NEW POINTERS
+          lines_to_return += ["@SP", "D = M", "@LCL", "M = D"]
+
+          arg_new_pointer = 5 + int(parameter_)
+          lines_to_return += ["@LCL", "D = M", "@" + str(arg_new_pointer), "D = D - A", "@ARG", "M = D"]
+
+        # JUMP TO FUNCTION
+          lines_to_return += ["@" + function_name_, "0;JMP"]
+
+        # WHERE TO REUTRN
+          lines_to_return += ["(RETURN_ADD" + str(self._function_counter) + ")", ""]
+
+          self._function_counter+= 1
+
+          return lines_to_return
+            ###end here####
 
     def write_line(self, line):
          if self.PUSH == line[0]:
@@ -66,7 +103,7 @@ class CodeWriter:
              return self.get_logic_line(line[0])
          elif line[0] in self.binary_table:
              return self.get_arithmatic_binary_operator(line[0])
-         elif line[0] == "label":
+         elif "label" in line[0]:
              return self.get_label_line(line[1])
          elif "if-goto" in line[0]:
              return self.get_if_line(line[1])
@@ -81,30 +118,40 @@ class CodeWriter:
 
 
     def get_return_line(self):
-        ret_lines =[self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + "R14", "M = D"]
-        ret_lines += [self.ADDRESS_SIGN + "5", "D = D - A", "A = D", "D = M", self.ADDRESS_SIGN + "R15", "M = D"]
-        ret_lines += self.get_pop_value("argument", str(0))
-        ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "M = D + 1", self.ADDRESS_SIGN + "R14", "D = M - 1",\
-                      "A = D", "D = M", self.ADDRESS_SIGN + "THAT", "M = D"]
 
-        ret_lines += [self.ADDRESS_SIGN + "2", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "THIS",\
-                      "M = D"]
+        ret_lines = []
+        # SAVE RETURN ADDRES IN R145
+        ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN +"5", "A = D - A", "D = M", self.ADDRESS_SIGN +"R15", "M = D"]
 
-        ret_lines += [self.ADDRESS_SIGN + "3", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "ARG",\
-                      "M = D"]
+        # SET REUTRN VALUE AND RESET SP
+        ret_lines += [self.ADDRESS_SIGN +"SP", "A = M - 1", "D = M", self.ADDRESS_SIGN +"ARG", "A = M", "M = D", self.ADDRESS_SIGN +"ARG", "D = M", self.ADDRESS_SIGN +"SP", "M = D + 1"]
 
-        ret_lines += [self.ADDRESS_SIGN + "3", "D = A", self.ADDRESS_SIGN + "R14", "D = M - D", "A = D", "D = M", self.ADDRESS_SIGN + "LCL",\
-                      "M = D"]
+        # LCL ADD IN R14 FOR CALC
+        ret_lines += [self.ADDRESS_SIGN +"LCL", "D = M", self.ADDRESS_SIGN +"4", "D = D - A", self.ADDRESS_SIGN +"R14", "M = D"]
 
-        ret_lines += [self.ADDRESS_SIGN + "R15", "A = M", "0;JMP"]
+        # SET LCL
+        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"1", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
 
-        return  ret_lines
+        # SET ARG
+        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"2", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+
+        # SET THIS
+        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"3", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+
+        # SET THAT
+        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"4", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", ""]
+
+        # GOTO RETURN STATMENT
+        ret_lines += [self.ADDRESS_SIGN +"R15", "A = M", "0;JMP", ""]
+
+        return ret_lines
+
 
     def get_function_line(self, function_name_, parameter_):
         self._program_name = function_name_
-        ret_lines = ["(" + self._program_name + ")", self.ADDRESS_SIGN + self.SP, ]
+        ret_lines = ["(" + self._program_name + ")"]
         for i in range(int(parameter_)):
-            ret_lines += [self.ADDRESS_SIGN + parameter_, "D = A"]
+            ret_lines += [self.ADDRESS_SIGN + "0", "D = A"]
             ret_lines += [self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
             ret_lines += self.increase_SP()
         return ret_lines
@@ -114,7 +161,7 @@ class CodeWriter:
                 self.ADDRESS_SIGN + self._program_name + "::" + value_, "D;JNE"]
 
     def get_goto_line(self, value_):
-        return [self.ADDRESS_SIGN + self._program_name + "::" + value_, "0:jmp"]
+        return [self.ADDRESS_SIGN + self._program_name + "::" + value_, "0;JMP"]
 
     def get_label_line(self, value_):
         return ["(" + self._program_name + "::" + value_ + ")"]
@@ -143,7 +190,7 @@ class CodeWriter:
             ret_line += self.decrease_SP()
             return  ret_line
         elif segment_ == "static":
-            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M","@" + self._program_name + "." + value_, "M = D"]
+            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M",self.ADDRESS_SIGN + self._vm_name + "." + value_, "M = D"]
             ret_line += self.decrease_SP()
             return ret_line
         elif segment_ == "temp":

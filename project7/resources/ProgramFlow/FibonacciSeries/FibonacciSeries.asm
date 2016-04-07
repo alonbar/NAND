@@ -116,7 +116,7 @@ D = M
 @FibonacciSeries::COMPUTE_ELEMENT
 D;JNE
 @FibonacciSeries::END_PROGRAM
-0:jmp
+0;JMP
 (FibonacciSeries::COMPUTE_ELEMENT)
 @0
 D = A
@@ -229,5 +229,5 @@ M = D
 @SP
 M = M - 1
 @FibonacciSeries::MAIN_LOOP_START
-0:jmp
+0;JMP
 (FibonacciSeries::END_PROGRAM)
