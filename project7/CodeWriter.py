@@ -23,7 +23,7 @@ class CodeWriter:
         self._vm_name = program_name_
 
     def write_bootstrap(self):
-        ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]
+        ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]\
         # self._program_name = "Sys.init"
         ret_lines += self.get_call_line('Sys.init', str(0))
         return  ret_lines
@@ -119,33 +119,33 @@ class CodeWriter:
 
     def get_return_line(self):
 
-        ret_lines = []
-        # SAVE RETURN ADDRES IN R145
-        ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN +"5", "A = D - A", "D = M", self.ADDRESS_SIGN +"R15", "M = D"]
+          lines_to_return = []
 
-        # SET REUTRN VALUE AND RESET SP
-        ret_lines += [self.ADDRESS_SIGN +"SP", "A = M - 1", "D = M", self.ADDRESS_SIGN +"ARG", "A = M", "M = D", self.ADDRESS_SIGN +"ARG", "D = M", self.ADDRESS_SIGN +"SP", "M = D + 1"]
+          # SAVE RETURN ADDRES IN R14
+          lines_to_return += ["@LCL", "D = M", "@5", "A = D - A", "D = M", "@R14", "M = D"]
 
-        # LCL ADD IN R14 FOR CALC
-        ret_lines += [self.ADDRESS_SIGN +"LCL", "D = M", self.ADDRESS_SIGN +"4", "D = D - A", self.ADDRESS_SIGN +"R14", "M = D"]
+          # SET REUTRN VALUE AND RESET SP
+          lines_to_return += ["@SP", "A = M - 1", "D = M", "@ARG", "A = M", "M = D", "@ARG", "D = M", "@SP", "M = D + 1"]
 
-        # SET LCL
-        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"1", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+          # LCL ADD IN R13 FOR CALC
+          lines_to_return += ["@LCL", "D = M", "@4", "D = D - A", "@R13", "M = D"]
 
-        # SET ARG
-        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"2", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+          # SET LCL
+          lines_to_return += ["@R13", "A = M", "D = M", "@LCL", "M = D", "@R13", "M = M + 1"]
 
-        # SET THIS
-        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"3", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+          # SET ARG
+          lines_to_return += ["@R13", "A = M", "D = M", "@ARG", "M = D", "@R13", "M = M + 1"]
 
-        # SET THAT
-        ret_lines += [self.ADDRESS_SIGN +"R14", "A = M", "D = M", self.ADDRESS_SIGN +"4", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", ""]
+          # SET THIS
+          lines_to_return += ["@R13", "A = M", "D = M", "@THIS", "M = D", "@R13", "M = M + 1"]
 
-        # GOTO RETURN STATMENT
-        ret_lines += [self.ADDRESS_SIGN +"R15", "A = M", "0;JMP", ""]
+          # SET THAT
+          lines_to_return += ["@R13", "A = M", "D = M", "@THAT", "M = D", "@R13", "M = M + 1", ""]
 
-        return ret_lines
+          # GOTO RETURN STATMENT
+          lines_to_return += ["@R14", "A = M", "0;JMP", ""]
 
+          return  lines_to_return
 
     def get_function_line(self, function_name_, parameter_):
         self._program_name = function_name_
@@ -190,12 +190,20 @@ class CodeWriter:
             ret_line += self.decrease_SP()
             return  ret_line
         elif segment_ == "static":
-            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M",self.ADDRESS_SIGN + self._vm_name + "." + value_, "M = D"]
+            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M",self.ADDRESS_SIGN + self._vm_name + "." + value_,  "M = D"]
             ret_line += self.decrease_SP()
             return ret_line
         elif segment_ == "temp":
-            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M", self.ADDRESS_SIGN + str(int(value_) + 5), "M = D"]
+            ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M", self.ADDRESS_SIGN + str(int(value_) + 5),  "M = D"]
             ret_line += self.decrease_SP()
+
+            ###LIOR
+            # ret_line += ['@' + str(5 + int(value_)), "D = A", "@R14", "M = D", "A = M",\
+            # "D = M"]
+            # ret_line += [ "@SP", "A = M - 1", "D = M", "@R14", "A = M", "M = D", "@SP", \
+            # "M = M - 1"]
+
+            ##END LIOR
             return ret_line
 
     def get_push_constant(self, value_):
@@ -207,7 +215,7 @@ class CodeWriter:
         ret_line = []
         if segment_ in self.segment_table:
             ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "A = D + M","A = M" ,"D = A", \
-                        self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+                        self.ADDRESS_SIGN + self.SP, "A = M", "M = D", "D = M"]
             ret_line += self.increase_SP()
             return  ret_line
         elif segment_ == "pointer":
@@ -221,7 +229,7 @@ class CodeWriter:
             ret_line += self.increase_SP()
             return  ret_line
         elif segment_ == "static":
-            ret_line += ["@" + self._program_name + "." + value_]
+            ret_line += ["@" + self._vm_name + "." + value_]
             ret_line += ["D = M"]
             ret_line += [self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
             ret_line += self.increase_SP()
