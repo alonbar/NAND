@@ -29,66 +29,24 @@ class CodeWriter:
         return  ret_lines
 
     def get_call_line(self, function_name_, parameter_):
-        # #pushing return address
-        # add_return = "address_return_"
-        # ret_lines = [self.ADDRESS_SIGN + add_return+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
-        #              "A = M", "M = D"]
-        # ret_lines += self.increase_SP()
-        # #setting LCL base address
-        # ret_lines += [self.ADDRESS_SIGN + "LCL", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        # ret_lines += self.increase_SP()
-        # #setting ARG base address
-        # ret_lines += [self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        # ret_lines += self.increase_SP()
-        # #setting THIS base address
-        # ret_lines += [self.ADDRESS_SIGN + "THIS", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        # ret_lines += self.increase_SP()
-        # #setting THAT base address
-        # ret_lines += [self.ADDRESS_SIGN + "THAT", "D = M", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
-        # ret_lines += self.increase_SP()
-        # #setting ARG=SP-n-5 base address
-        # ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", \
-        #               self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
-        #               self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "LCL", "M = D"]
-        # #setting go to f
-        # ret_lines += ["@ARG", "D = M", self.ADDRESS_SIGN + function_name_, "0;JMP", "(" + add_return+ str(self._function_counter) + ")"]
-        # self._function_counter +=1
-        # return ret_lines
-
-        ###from lior####
-          lines_to_return = []
-
-        # PUSH RETURN ADDRESS
-          lines_to_return += ["@RETURN_ADD" + str(self._function_counter), "D = A", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
-
-        # PUSH LCL
-          lines_to_return += ["@LCL", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
-
-        # PUSH ARG
-          lines_to_return += ["@ARG", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
-
-        # PUSH THIS
-          lines_to_return += ["@THIS", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
-
-        # PUSH THAT
-          lines_to_return += ["@THAT", "D = M", "@SP", "A = M", "M = D", "@SP", " M = M + 1"]
-
-        # SET NEW POINTERS
-          lines_to_return += ["@SP", "D = M", "@LCL", "M = D"]
-
-          arg_new_pointer = 5 + int(parameter_)
-          lines_to_return += ["@LCL", "D = M", "@" + str(arg_new_pointer), "D = D - A", "@ARG", "M = D"]
-
-        # JUMP TO FUNCTION
-          lines_to_return += ["@" + function_name_, "0;JMP"]
-
-        # WHERE TO REUTRN
-          lines_to_return += ["(RETURN_ADD" + str(self._function_counter) + ")", ""]
-
-          self._function_counter+= 1
-
-          return lines_to_return
-            ###end here####
+        #pushing return address
+        callback_add = "callback_"
+        label = "(" + callback_add+ str(self._function_counter) + ")"
+        ret_lines = [self.ADDRESS_SIGN + callback_add+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
+                     "A = M", "M = D"]
+        ret_lines += self.increase_SP()
+        ret_lines += [self.ADDRESS_SIGN + "1", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        ret_lines += self.increase_SP()
+        ret_lines += [self.ADDRESS_SIGN + "2", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        ret_lines += self.increase_SP()
+        ret_lines += [self.ADDRESS_SIGN + "3", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        ret_lines += self.increase_SP()
+        ret_lines += [self.ADDRESS_SIGN + "4", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
+        ret_lines += self.increase_SP()
+        ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
+                      self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "R14", "A = M", self.ADDRESS_SIGN + "LCL", "M = D", self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + function_name_, "0;JMP", label]
+        self._function_counter +=1
+        return ret_lines
 
     def write_line(self, line):
          if self.PUSH == line[0]:
@@ -119,33 +77,57 @@ class CodeWriter:
 
     def get_return_line(self):
 
-          lines_to_return = []
+        ret_lines = [self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN +"5", "A = D - A", "D = M", self.ADDRESS_SIGN +"R15", "M = D"]
 
-          # SAVE RETURN ADDRES IN R14
-          lines_to_return += ["@LCL", "D = M", "@5", "A = D - A", "D = M", "@R14", "M = D"]
+        ret_lines += [self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D", self.ADDRESS_SIGN + "R14", "A = M", self.ADDRESS_SIGN +"SP", "A = M - 1", "D = M", self.ADDRESS_SIGN +"R13", "A = M", "M = D",
+                      self.ADDRESS_SIGN +"R13", "D = M", self.ADDRESS_SIGN +"SP", "M = D + 1", self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN + "R13", "M = D", self.ADDRESS_SIGN +"R13", "D = M",
+                      self.ADDRESS_SIGN + "R14", "A =M", self.ADDRESS_SIGN +"4", "D = D - A", self.ADDRESS_SIGN +"R14", "M = D", "A = M", self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
+        # SET LCL
+        ret_lines += ["D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
 
-          # SET REUTRN VALUE AND RESET SP
-          lines_to_return += ["@SP", "A = M - 1", "D = M", "@ARG", "A = M", "M = D", "@ARG", "D = M", "@SP", "M = D + 1"]
+        ret_lines += [self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
+        # SET ARG
+        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
 
-          # LCL ADD IN R13 FOR CALC
-          lines_to_return += ["@LCL", "D = M", "@4", "D = D - A", "@R13", "M = D"]
+        ret_lines += [self.ADDRESS_SIGN + "3", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
+        # SET THIS
+        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
+        ret_lines += [self.ADDRESS_SIGN + "4", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
+        # SET THAT
+        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", ""]
 
-          # SET LCL
-          lines_to_return += ["@R13", "A = M", "D = M", "@LCL", "M = D", "@R13", "M = M + 1"]
+        # GOTO RETURN STATMENT
+        ret_lines += [self.ADDRESS_SIGN +"R15", "A = M", "0;JMP", ""]
 
-          # SET ARG
-          lines_to_return += ["@R13", "A = M", "D = M", "@ARG", "M = D", "@R13", "M = M + 1"]
-
-          # SET THIS
-          lines_to_return += ["@R13", "A = M", "D = M", "@THIS", "M = D", "@R13", "M = M + 1"]
-
-          # SET THAT
-          lines_to_return += ["@R13", "A = M", "D = M", "@THAT", "M = D", "@R13", "M = M + 1", ""]
-
-          # GOTO RETURN STATMENT
-          lines_to_return += ["@R14", "A = M", "0;JMP", ""]
-
-          return  lines_to_return
+        return ret_lines
+        #
+        #   lines_to_return = []
+        #
+        #   # SAVE RETURN ADDRES IN R14
+        #   lines_to_return += ["@LCL", "D = M", "@5", "A = D - A", "D = M", "@R14", "M = D"]
+        #
+        #   # SET REUTRN VALUE AND RESET SP
+        #   lines_to_return += ["@SP", "A = M - 1", "D = M", "@ARG", "A = M", "M = D", "@ARG", "D = M", "@SP", "M = D + 1"]
+        #
+        #   # LCL ADD IN R13 FOR CALC
+        #   lines_to_return += ["@LCL", "D = M", "@4", "D = D - A", "@R13", "M = D"]
+        #
+        #   # SET LCL
+        #   lines_to_return += ["@R13", "A = M", "D = M", "@LCL", "M = D", "@R13", "M = M + 1"]
+        #
+        #   # SET ARG
+        #   lines_to_return += ["@R13", "A = M", "D = M", "@ARG", "M = D", "@R13", "M = M + 1"]
+        #
+        #   # SET THIS
+        #   lines_to_return += ["@R13", "A = M", "D = M", "@THIS", "M = D", "@R13", "M = M + 1"]
+        #
+        #   # SET THAT
+        #   lines_to_return += ["@R13", "A = M", "D = M", "@THAT", "M = D", "@R13", "M = M + 1", ""]
+        #
+        #   # GOTO RETURN STATMENT
+        #   lines_to_return += ["@R14", "A = M", "0;JMP", ""]
+        #
+        #   return  lines_to_return
 
     def get_function_line(self, function_name_, parameter_):
         self._program_name = function_name_
