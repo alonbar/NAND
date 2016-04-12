@@ -17,17 +17,19 @@ M = M - 1
 @SP
 M = M - 1
 @SP
+A = M
 D = M
 @R13
 M = D
 @SP
 M = M + 1
 @SP
+A = M
 D = M
 @R14
 M = D
 @R13
-D = M & D
+D = D & M
 D = !D
 @R15
 M = D
@@ -73,7 +75,6 @@ M = 0
 (FINISH0)
 @SP
 M = M + 1
-
 @892
 D = A
 @SP
@@ -93,17 +94,19 @@ M = M - 1
 @SP
 M = M - 1
 @SP
+A = M
 D = M
 @R13
 M = D
 @SP
 M = M + 1
 @SP
+A = M
 D = M
 @R14
 M = D
 @R13
-D = M & D
+D = D & M
 D = !D
 @R15
 M = D
@@ -149,7 +152,6 @@ M = 0
 (FINISH1)
 @SP
 M = M + 1
-
 @32767
 D = A
 @SP
@@ -169,17 +171,19 @@ M = M - 1
 @SP
 M = M - 1
 @SP
+A = M
 D = M
 @R13
 M = D
 @SP
 M = M + 1
 @SP
+A = M
 D = M
 @R14
 M = D
 @R13
-D = M & D
+D = D & M
 D = !D
 @R15
 M = D
@@ -225,7 +229,6 @@ M = 0
 (FINISH2)
 @SP
 M = M + 1
-
 @56
 D = A
 @SP

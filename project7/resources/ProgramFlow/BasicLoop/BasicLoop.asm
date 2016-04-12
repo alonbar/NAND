@@ -1,209 +1,137 @@
-@256
-D = A
-@0
-M = D
-@RETURN_ADD0
-D = A
-@SP
-A = M
-M = D
-@SP
- M = M + 1
-@LCL
-D = M
-@SP
-A = M
-M = D
-@SP
- M = M + 1
-@ARG
-D = M
-@SP
-A = M
-M = D
-@SP
- M = M + 1
-@THIS
-D = M
-@SP
-A = M
-M = D
-@SP
- M = M + 1
-@THAT
-D = M
-@SP
-A = M
-M = D
-@SP
- M = M + 1
-@SP
-D = M
-@LCL
-M = D
-@LCL
-D = M
-@5
-D = D - A
-@ARG
-M = D
-@Sys.init
-0;JMP
-(RETURN_ADD0)
 @0
 D = A
 @SP
 A = M
 M = D
-D = A + 1
 @SP
-M = D
-@LCL
-D = M
+M = M + 1
 @0
-D = D + A
-@R14
+D = A
+@LCL
+D = D + M
+@R15
 M = D
-A = M
-D = M
 @SP
 A = M - 1
 D = M
-@R14
+@R15
 A = M
 M = D
 @SP
 M = M - 1
-(Sys.init$LOOP_START)
+(Sys.init::LOOP_START)
+@0
+D = A
 @ARG
+A = D + M
+A = M
+D = A
+@SP
+A = M
+M = D
 D = M
+@SP
+M = M + 1
 @0
-D = D + A
-@R14
-M = D
-A = M
-D = M
-@SP
-A = M
-M = D
-D = A + 1
-@SP
-M = D
+D = A
 @LCL
-D = M
-@0
-D = D + A
-@R14
-M = D
+A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
-D = A + 1
+D = M
 @SP
-M = D
+M = M + 1
 @SP
 A = M - 1
 D = M
 A = A - 1
-M = D + M
-D = A + 1
+M = M + D
 @SP
-M = D
-@LCL
-D = M
+M = M - 1
 @0
-D = D + A
-@R14
+D = A
+@LCL
+D = D + M
+@R15
 M = D
-A = M
-D = M
 @SP
 A = M - 1
 D = M
-@R14
+@R15
 A = M
 M = D
 @SP
 M = M - 1
-@ARG
-D = M
 @0
-D = D + A
-@R14
-M = D
+D = A
+@ARG
+A = D + M
 A = M
+D = A
+@SP
+A = M
+M = D
 D = M
 @SP
-A = M
-M = D
-D = A + 1
-@SP
-M = D
+M = M + 1
 @1
 D = A
 @SP
 A = M
 M = D
-D = A + 1
 @SP
-M = D
+M = M + 1
 @SP
 A = M - 1
 D = M
 A = A - 1
 M = M - D
-D = A + 1
 @SP
-M = D
-@ARG
-D = M
+M = M - 1
 @0
-D = D + A
-@R14
+D = A
+@ARG
+D = D + M
+@R15
 M = D
-A = M
-D = M
 @SP
 A = M - 1
 D = M
-@R14
+@R15
 A = M
 M = D
 @SP
 M = M - 1
+@0
+D = A
 @ARG
-D = M
-@0
-D = D + A
-@R14
-M = D
+A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
-D = A + 1
+D = M
 @SP
-M = D
+M = M + 1
 @SP
 M = M - 1
 A = M
 D = M
-@Sys.init$LOOP_START
+@Sys.init::LOOP_START
 D;JNE
-@LCL
-D = M
 @0
-D = D + A
-@R14
-M = D
+D = A
+@LCL
+A = D + M
 A = M
+D = A
+@SP
+A = M
+M = D
 D = M
 @SP
-A = M
-M = D
-D = A + 1
-@SP
-M = D
+M = M + 1

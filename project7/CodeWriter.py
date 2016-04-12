@@ -1,4 +1,4 @@
-
+import classWriterLogicWriter
 class CodeWriter:
     PUSH = "push"
     POP = "pop"
@@ -23,16 +23,14 @@ class CodeWriter:
         self._vm_name = program_name_
 
     def write_bootstrap(self):
-        ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]\
-        # self._program_name = "Sys.init"
+        ret_lines = [self.ADDRESS_SIGN + "256", "D = A", self.ADDRESS_SIGN + self.SP, "M = D"]
         ret_lines += self.get_call_line('Sys.init', str(0))
         return  ret_lines
 
     def get_call_line(self, function_name_, parameter_):
-        #pushing return address
         callback_add = "callback_"
         label = "(" + callback_add+ str(self._function_counter) + ")"
-        ret_lines = [self.ADDRESS_SIGN + callback_add+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP, \
+        ret_lines = [self.ADDRESS_SIGN + callback_add+ str(self._function_counter), "D = A", self.ADDRESS_SIGN + self.SP,
                      "A = M", "M = D"]
         ret_lines += self.increase_SP()
         ret_lines += [self.ADDRESS_SIGN + "1", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
@@ -43,7 +41,7 @@ class CodeWriter:
         ret_lines += self.increase_SP()
         ret_lines += [self.ADDRESS_SIGN + "4", "A = M", "D = A", self.ADDRESS_SIGN + "R14", "M = D", self.ADDRESS_SIGN + self.SP, "A = M", "M = D"]
         ret_lines += self.increase_SP()
-        ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",\
+        ret_lines += [self.ADDRESS_SIGN + "SP", "D = M", self.ADDRESS_SIGN + parameter_, "D = D - A", self.ADDRESS_SIGN + "5", "D = D - A", self.ADDRESS_SIGN + "ARG", "M = D",
                       self.ADDRESS_SIGN + self.SP, "D = M", self.ADDRESS_SIGN + "R14", "A = M", self.ADDRESS_SIGN + "LCL", "M = D", self.ADDRESS_SIGN + "ARG", "D = M", self.ADDRESS_SIGN + function_name_, "0;JMP", label]
         self._function_counter +=1
         return ret_lines
@@ -77,57 +75,18 @@ class CodeWriter:
 
     def get_return_line(self):
 
-        ret_lines = [self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN +"5", "A = D - A", "D = M", self.ADDRESS_SIGN +"R15", "M = D"]
+        ret_lines = [self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN +"5", "A = D - A", "D = M", self.ADDRESS_SIGN +"R15", "M = D", self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D",
+                     self.ADDRESS_SIGN + "R14", "A = M", self.ADDRESS_SIGN +"SP", "A = M - 1", "D = M", self.ADDRESS_SIGN +"R13", "A = M", "M = D", self.ADDRESS_SIGN +"R13", "D = M",
+                     self.ADDRESS_SIGN +"SP", "M = D + 1", self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN + "R13", "M = D", self.ADDRESS_SIGN +"R13", "D = M",
+                     self.ADDRESS_SIGN + "R14", "A =M", self.ADDRESS_SIGN +"4", "D = D - A", self.ADDRESS_SIGN +"R14", "M = D", "A = M","D = M", self.ADDRESS_SIGN + "1", "M = D",  "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
 
-        ret_lines += [self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D", self.ADDRESS_SIGN + "R14", "A = M", self.ADDRESS_SIGN +"SP", "A = M - 1", "D = M", self.ADDRESS_SIGN +"R13", "A = M", "M = D",
-                      self.ADDRESS_SIGN +"R13", "D = M", self.ADDRESS_SIGN +"SP", "M = D + 1", self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN + "R13", "M = D", self.ADDRESS_SIGN +"R13", "D = M",
-                      self.ADDRESS_SIGN + "R14", "A =M", self.ADDRESS_SIGN +"4", "D = D - A", self.ADDRESS_SIGN +"R14", "M = D", "A = M", self.ADDRESS_SIGN + "1", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
-        # SET LCL
-        ret_lines += ["D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
-
-        ret_lines += [self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
-        # SET ARG
-        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
-
-        ret_lines += [self.ADDRESS_SIGN + "3", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
-        # SET THIS
-        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1"]
-        ret_lines += [self.ADDRESS_SIGN + "4", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
-        # SET THAT
-        ret_lines += ["A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", ""]
-
-        # GOTO RETURN STATMENT
-        ret_lines += [self.ADDRESS_SIGN +"R15", "A = M", "0;JMP", ""]
+        ret_lines += ["D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", self.ADDRESS_SIGN + "2", "D = M", self.ADDRESS_SIGN + "R13", "M = D", "A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D",
+                      self.ADDRESS_SIGN + "R14", "A = M", "D = M", self.ADDRESS_SIGN + "2", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", self.ADDRESS_SIGN + "3", "D = M", self.ADDRESS_SIGN + "R13", "M = D", "A = M", "D = M",
+                      self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN + "R14", "A = M", "D = M", self.ADDRESS_SIGN + "3", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", self.ADDRESS_SIGN + "4", "D = M", self.ADDRESS_SIGN + "R13",
+                      "M = D", "A = M", "D = M", self.ADDRESS_SIGN +"R13", "M = D", self.ADDRESS_SIGN + "R14", "A = M", "D = M", self.ADDRESS_SIGN + "4", "M = D", self.ADDRESS_SIGN +"R14", "M = M + 1", self.ADDRESS_SIGN +"R15",
+                      "A = M", "0;JMP"]
 
         return ret_lines
-        #
-        #   lines_to_return = []
-        #
-        #   # SAVE RETURN ADDRES IN R14
-        #   lines_to_return += ["@LCL", "D = M", "@5", "A = D - A", "D = M", "@R14", "M = D"]
-        #
-        #   # SET REUTRN VALUE AND RESET SP
-        #   lines_to_return += ["@SP", "A = M - 1", "D = M", "@ARG", "A = M", "M = D", "@ARG", "D = M", "@SP", "M = D + 1"]
-        #
-        #   # LCL ADD IN R13 FOR CALC
-        #   lines_to_return += ["@LCL", "D = M", "@4", "D = D - A", "@R13", "M = D"]
-        #
-        #   # SET LCL
-        #   lines_to_return += ["@R13", "A = M", "D = M", "@LCL", "M = D", "@R13", "M = M + 1"]
-        #
-        #   # SET ARG
-        #   lines_to_return += ["@R13", "A = M", "D = M", "@ARG", "M = D", "@R13", "M = M + 1"]
-        #
-        #   # SET THIS
-        #   lines_to_return += ["@R13", "A = M", "D = M", "@THIS", "M = D", "@R13", "M = M + 1"]
-        #
-        #   # SET THAT
-        #   lines_to_return += ["@R13", "A = M", "D = M", "@THAT", "M = D", "@R13", "M = M + 1", ""]
-        #
-        #   # GOTO RETURN STATMENT
-        #   lines_to_return += ["@R14", "A = M", "0;JMP", ""]
-        #
-        #   return  lines_to_return
 
     def get_function_line(self, function_name_, parameter_):
         self._program_name = function_name_
@@ -139,7 +98,7 @@ class CodeWriter:
         return ret_lines
 
     def get_if_line(self, value_):
-        return [self.ADDRESS_SIGN + self.SP, "M = M - 1", "A = M", "D = M", \
+        return [self.ADDRESS_SIGN + self.SP, "M = M - 1", "A = M", "D = M",
                 self.ADDRESS_SIGN + self._program_name + "::" + value_, "D;JNE"]
 
     def get_goto_line(self, value_):
@@ -157,8 +116,8 @@ class CodeWriter:
     def get_pop_value(self, segment_, value_):
         ret_line = []
         if segment_ in self.segment_table:
-            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "D = D + M", \
-                         self.ADDRESS_SIGN + "R15", "M = D", self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M", \
+            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "D = D + M",
+                         self.ADDRESS_SIGN + "R15", "M = D", self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M",
                          self.ADDRESS_SIGN + "R15", "A = M", "M = D"]
             ret_line += self.decrease_SP()
             return ret_line
@@ -178,14 +137,6 @@ class CodeWriter:
         elif segment_ == "temp":
             ret_line += [self.ADDRESS_SIGN + self.SP, "A = M - 1", "D = M", self.ADDRESS_SIGN + str(int(value_) + 5),  "M = D"]
             ret_line += self.decrease_SP()
-
-            ###LIOR
-            # ret_line += ['@' + str(5 + int(value_)), "D = A", "@R14", "M = D", "A = M",\
-            # "D = M"]
-            # ret_line += [ "@SP", "A = M - 1", "D = M", "@R14", "A = M", "M = D", "@SP", \
-            # "M = M - 1"]
-
-            ##END LIOR
             return ret_line
 
     def get_push_constant(self, value_):
@@ -196,12 +147,11 @@ class CodeWriter:
     def get_push_segment(self, segment_, value_):
         ret_line = []
         if segment_ in self.segment_table:
-            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "A = D + M","A = M" ,"D = A", \
+            ret_line += [self.ADDRESS_SIGN + value_, "D = A", self.ADDRESS_SIGN + self.segment_table[segment_], "A = D + M","A = M" ,"D = A",
                         self.ADDRESS_SIGN + self.SP, "A = M", "M = D", "D = M"]
             ret_line += self.increase_SP()
             return  ret_line
         elif segment_ == "pointer":
-            #determining if it is @THIS or @THAT
             if int(value_) == 0:
                 ret_line += [self.ADDRESS_SIGN + "THIS"]
             else:
@@ -227,6 +177,7 @@ class CodeWriter:
         ret_line = [self.ADDRESS_SIGN + self.SP]
         ret_line += ["M = M + 1"]
         return ret_line
+
 
     def decrease_SP(self):
         ret_line = [self.ADDRESS_SIGN + self.SP]
@@ -262,37 +213,14 @@ class CodeWriter:
         jmp_val = self.logic_table[value_]
         ret_lines = self.decrease_SP()
         ret_lines += self.decrease_SP()
-        ret_lines += [self.ADDRESS_SIGN + self.SP, "A = M", "D = M", "@R13", "M = D"]
+        ret_lines += [self.ADDRESS_SIGN + self.SP, "A = M", "D = M", self.ADDRESS_SIGN + "R13", "M = D"]
         ret_lines += self.increase_SP()
-
-        #calculating different signs
-        ret_lines += [self.ADDRESS_SIGN + self.SP, "A = M" ,"D = M", "@R14", "M = D", "@R13", "D = M & D", "D = !D", "@R15", "M = D", \
-                     "@R14", "D = M", "@R13", "D = M | D", "@R15", "D = M & D", "@LABEL_DIFF" + str(self.label_counter), \
-                     "D;" + self.logic_table[self.LT]]
-
-        #IF we here it mean that they have same sign or one is 0 and second is positivie
-        ret_lines += ["@R13", "D = M", "@R14", "D = D - M", "@T" + str(self.label_counter), "D;" + self.logic_table[value_], \
-                      "@F" + str(self.label_counter), "0;JMP"]
-
-        # IF WE here it mean that they have dif sign or one is 0 and second is negetive
-        ret_lines += ["(LABEL_DIFF_" + str(self.label_counter) + ")", "@R13", "D = M", "@T" + str(self.label_counter), \
-                      "D;" + self.logic_table[value_], "@F" + str(self.label_counter), "0;JMP"]
-        #TRUE case
-        ret_lines += ["(T" + str(self.label_counter) + ")", "@0", "D = !A"]
-        ret_lines += self.decrease_SP()
-        ret_lines += ["A = M", "M = D", "@FINISH" + str(self.label_counter), "0;JMP"]
-
-
-        # FALSE case
-
-        ret_lines += ["(F" + str(self.label_counter) + ")"]
-        ret_lines += self.decrease_SP()
-        ret_lines += ["A = M", "M = 0", "@FINISH" + str(self.label_counter), "0;JMP"]
-
-        # END Case
-        ret_lines += ["(FINISH" + str(self.label_counter) + ")", self.ADDRESS_SIGN + self.SP, "M = M + 1", ""]
-
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.check_signs(self.label_counter)
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.first_case(value_,self.label_counter)
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.second_case(value_,self.label_counter)
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.get_true(self.label_counter)
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.get_false(self.label_counter)
+        ret_lines += classWriterLogicWriter.classWriterLogicWriter.get_end(self.label_counter)
         self.label_counter += 1
-
         return ret_lines
 

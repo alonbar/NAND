@@ -7,6 +7,7 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
@@ -67,6 +68,7 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @2
@@ -97,7 +99,7 @@ A = M
 M = D
 @SP
 M = M - 1
-(FibonacciSeries::MAIN_LOOP_START)
+(Sys.init::MAIN_LOOP_START)
 @0
 D = A
 @ARG
@@ -107,17 +109,18 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
 M = M - 1
 A = M
 D = M
-@FibonacciSeries::COMPUTE_ELEMENT
+@Sys.init::COMPUTE_ELEMENT
 D;JNE
-@FibonacciSeries::END_PROGRAM
+@Sys.init::END_PROGRAM
 0;JMP
-(FibonacciSeries::COMPUTE_ELEMENT)
+(Sys.init::COMPUTE_ELEMENT)
 @0
 D = A
 @THAT
@@ -127,6 +130,7 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @1
@@ -138,6 +142,7 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
@@ -198,6 +203,7 @@ D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @1
@@ -228,6 +234,6 @@ A = M
 M = D
 @SP
 M = M - 1
-@FibonacciSeries::MAIN_LOOP_START
+@Sys.init::MAIN_LOOP_START
 0;JMP
-(FibonacciSeries::END_PROGRAM)
+(Sys.init::END_PROGRAM)
