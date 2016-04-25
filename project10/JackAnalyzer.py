@@ -23,6 +23,7 @@ class JackAnalyzer:
         tokenizer.tokenize()
 
 
+
 if __name__ == "__main__":
     analyzer = JackAnalyzer(sys.argv[1])
     analyzer.analyze()

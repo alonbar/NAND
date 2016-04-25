@@ -36,22 +36,43 @@ class JackTokernizer:
                 line = line.strip()
                 str += " " + line
         str = re.sub(re.compile("/\*.*?\*/",re.DOTALL ) ,"" ,str) # remove all occurance streamed comments (/*COMMENT */) from string
-        # str = re.sub(re.compile("/\*\*.*?\*/",re.DOTALL ) ,"" ,str) # remove all occurance streamed comments (/*COMMENT */) from string
+        arr_temp_initial = []
+        last_mark = 0
+        i = 0
 
-        # str = str.replace("{", " { ").replace("}", " } ").replace("(", " ( ").replace(")", " ) ").replace("[", " [ ")\
-        #     .replace("]", " ] ").replace(".", " . ").replace(";", " ; ").replace(",", " , ").replace(";", " ; ")\
-        #     .replace("+", " + ").replace("-", " - ").replace("*", " * ").replace("/", " / ").replace("&", " & ")\
-        #     .replace("|", " | ").replace("<", " < ").replace(">", " > ").replace("=", " = ").replace("~"," ~ ")
-        arr_temp = re.split('({)*(})*(\()*(\)+?)(\[)*(\])*(\.)*(,)*(;)*(\+)*(-)*(\*)*(/)*(&)*(|)*(<)*(>)*(=)*(\~)*(class )*(constructor )*(function )*(method )*(field)*(static )*(var )*(int )*(char )*(boolean )*(void )*(Array )*(true)*(false)*(null)*(this)*(let )*(do )*(if)*(else)*(while)*(return)*', str)
+        #extract all strings into a temporart array so that the files will be ready to be read using regex
+        while (i < len(str)):
+            if str[i] == '"':
+                arr_temp_initial.append(str[last_mark:i])
+                j = i + 1
+                while (j < len(str)):
+                    if str[j] == '"':
+                        arr_temp_initial.append(str[i:j+1])
+                        last_mark = j+1
+                        break
+                    j+=1
+                i = j+1
+                continue
+            i+=1
+        if last_mark  < len(str):
+            arr_temp_initial.append(str[last_mark:])
+
+        #create another temporary array that contains all code parts using the "known" language symbols as separators
+        arr_temp_second = []
+        for item in arr_temp_initial:
+            if item[0] == '"':
+                arr_temp_second.append(item)
+            else:
+                arr_temp_second += re.split('({+?)|(}+?)|(\(+?)|(\)+?)|(\[+?)|(\]+?)|(\.+?)|(,+?)|(;+?)|(\++?)|(-+?)|(\*+?)|(/+?)|(&+?)|(\|+?)|(<+?)|(>+?)|(=+?)|(\~+?)|(class )|(constructor )|(function )|(method )|(field)|(static )|(var )|(int )|(char )|(boolean )|(void )|(Array )|(true)|(false)|(null)|(this)|(let )|(do )|(if)|(else)|(while)|(return)', item)
+
         arr = []
-        for item in arr_temp:
+        for item in arr_temp_second:
             if item != None and bool(item.strip()):
                 arr.append(item)
         cnt = 0
+        #the regex didn't cover the cases of class and var types, so this part will find those places.
         while (cnt < len(arr)):
             if arr[cnt] != None and arr[cnt].strip() != "":
-                print (cnt)
-                print (arr[cnt] )
                 self._raw_program.append(arr[cnt].strip())
                 if arr[cnt].strip() in ["constructor", "function", "method", "field", "static", "var"] and arr[cnt+1].strip() not in ["int", "char", "boolean","void", "Array"]:
                     identifiers = arr[cnt+1].split()
@@ -62,16 +83,6 @@ class JackTokernizer:
                     cnt+=1
             else:
                 cnt +=1
-
-        #
-        # for item in arr:
-        #     if item != None and item.strip() != "":
-        #         if item in [""]
-        #         item_arr = item.split()
-        #         if (len(item_arr) > 1):
-        #             print ("asdf")
-        #         self._raw_program.append(item.strip())
-        print (self._raw_program)
 
     def tokenize(self):
         output_file = open(self._input_file_path.replace(".jack", "T.xml"), "w")
@@ -94,7 +105,6 @@ class JackTokernizer:
         tokens += ["</tokens>\n"]
         for token in tokens:
             output_file.write(token)
-
         output_file.close()
 
 
@@ -123,14 +133,4 @@ class JackTokernizer:
 
     def get_identifier_line(self):
         return [self.IDENTIFIER_START + " " + self.get_next_token() + " " + self.IDENTIFIER_END]
-    # def get_keyword_line(self):
-    #     ret_lines = [self.KEYWORD_START + self.get_next_token() + self.KEYWORD_END,
-    #                  self.IDENTIFIER_START+ self.get_next_token() + self.IDENTIFIER_END,
-    #                  self.SYMBOL_START + self.get_next_token() + self.SYMBOL_END]
-    #     ret_lines += self.tokenize()
-    #     ret_lines += [self.SYMBOL_START + self.get_next_token() + self.SYMBOL_END
-    #     return ret_lines
 
-
-
-        print (self.raw_program)
