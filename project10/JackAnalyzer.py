@@ -1,6 +1,7 @@
 import sys
 import os
 import JackTokenizer
+import CompilationEngine
 import re
 class JackAnalyzer:
     def __init__(self, input_path_):
@@ -18,10 +19,9 @@ class JackAnalyzer:
 
     def analyze_file(self, input_file_path_):
         print("inside analyze_fle")
-        tokenizer = JackTokenizer.JackTokernizer(input_file_path_)
-        tokenizer.init()
-        tokenizer.tokenize()
-
+        engine = CompilationEngine.CompilationEngine(input_file_path_)
+        engine.initialize()
+        engine.compile_clase()
 
 
 if __name__ == "__main__":

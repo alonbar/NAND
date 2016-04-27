@@ -22,8 +22,9 @@ class JackTokernizer:
     def __init__(self, input_file_path_):
         self._input_file_path = input_file_path_
         self._raw_program = []
-        self.tokens= []
-        self.token_cnt = 0
+        self._tokens= []
+        self._token_cnt = 0
+        self._token_pnt = 0
 
     def init(self):
         str = ""
@@ -86,51 +87,65 @@ class JackTokernizer:
 
     def tokenize(self):
         output_file = open(self._input_file_path.replace(".jack", "T.xml"), "w")
-        tokens = []
-        tokens += ["<tokens>\n"]
+
+        self._tokens += ["<tokens>\n"]
         for word in self._raw_program:
             if word in self.KEYWORDS:
-                tokens += self.get_keyword_line()
+                self._tokens += self.get_keyword_line()
             elif word in self.SYMBOLS:
-                tokens += self.get_symbol_line()
+                self._tokens += self.get_symbol_line()
             else:
                 integer_regex = re.compile('\d+')
                 res = integer_regex.match(word)
                 if (res != None):
-                    tokens += self.get_int_constant_line()
+                    self._tokens += self.get_int_constant_line()
                 elif word[0] == '"':
-                    tokens += self.get_string_constant_line()
+                    self._tokens += self.get_string_constant_line()
                 else:
-                    tokens += self.get_identifier_line()
-        tokens += ["</tokens>\n"]
-        for token in tokens:
+                    self._tokens += self.get_identifier_line()
+        self._tokens += ["</tokens>\n"]
+        for token in self._tokens:
             output_file.write(token)
         output_file.close()
 
 
     def increase_token_count(self):
-        self.token_cnt += 1
+        self._token_cnt += 1
 
-    def get_next_token(self):
-        token = self._raw_program[self.token_cnt]
+    def get_next_raw_token(self):
+        token = self._raw_program[self._token_cnt]
         self.increase_token_count()
         return token
 
     def get_keyword_line(self):
-        return [self.KEYWORD_START + " " + self.get_next_token() + " " + self.KEYWORD_END]
+        return [self.KEYWORD_START + " " + self.get_next_raw_token() + " " + self.KEYWORD_END]
 
     def get_symbol_line(self):
-        return [self.SYMBOL_START+ " " + self.get_next_token().replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + " " + self.SYMBOL_END]
+        return [self.SYMBOL_START + " " + self.get_next_raw_token().replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + " " + self.SYMBOL_END]
 
     def get_int_constant_line(self):
-        return [self.INTEGET_CONSTANT_START + " " + self.get_next_token() + " " + self.INTEGET_CONSTANT_END]
+        return [self.INTEGET_CONSTANT_START + " " + self.get_next_raw_token() + " " + self.INTEGET_CONSTANT_END]
 
     def get_string_constant_line(self):
-        token = self.get_next_token()
+        token = self.get_next_raw_token()
         token = token[1:-1]
         token = token.replace('"', "&quot;")
         return [self.STRING_CONSTANT_START + " " + token + " " + self.STRING_CONSTANT_END]
 
     def get_identifier_line(self):
-        return [self.IDENTIFIER_START + " " + self.get_next_token() + " " + self.IDENTIFIER_END]
+        return [self.IDENTIFIER_START + " " + self.get_next_raw_token() + " " + self.IDENTIFIER_END]
 
+    def get_tokens(self):
+        return self._tokens
+
+    def get_next_token_type(self):
+        token_type = self._tokens[self._token_pnt][self._tokens[self._token_pnt].find("<") + 1:self._tokens[self._token_pnt].find(">")]
+        return token_type
+
+    def get_next_token_content(self):
+        token_content = self._tokens[self._token_pnt][self._tokens[self._token_pnt].find(">") + 2:self._tokens[self._token_pnt][2:].find("<") +1]
+        return token_content
+
+    def advance_token_ptr(self):
+        if self._token_pnt < len(self._tokens):
+            self._token_pnt += 1
