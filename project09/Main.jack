@@ -1,0 +1,18 @@
+
+
+/**
+ * The Main class initializes a new circle game and plays.
+ */
+class Main {
+
+    /** the initialization of a new game and the playing of it. */    
+    function void main() {
+        var CircleGame game;
+
+        let game = CircleGame.new();
+        do game.play();
+	do game.dispose();
+	do Output.printString(" done with game");
+        return;
+    }
+}

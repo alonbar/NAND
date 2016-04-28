@@ -1,0 +1,135 @@
+// circle game class, manages the game
+class CircleGame {
+
+	field int input;
+	field Platform plat;
+	field int points;
+	field Array circles;
+	field Circle c1,c2,c3,c4,c5,c6;
+	
+	// constructor
+	constructor CircleGame new() {
+		var int index;
+		let plat = Platform.new();
+		let points= 0;
+		let c1 = Circle.new(30,30,6);
+		let c2 = Circle.new(60,60,6);
+		let c3 = Circle.new(80,80,6);
+		let c4 = Circle.new(100,100,6);
+		let c5 = Circle.new(130,130,6);
+		let c6 = Circle.new(165,165,6);
+		
+		return this;
+	}
+	// desposes the game
+	method void dispose() {
+			
+		do c1.dispose();
+		do c2.dispose();
+		do c3.dispose();
+		do c4.dispose();
+		do c5.dispose();
+		do c6.dispose();
+		do plat.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+	// plays the game
+	method void play() {
+		var int indicator;
+		var int leftx;
+		var int lefty;
+		var boolean continues;
+		var int gameCounter;
+		var int direction;		
+		let continues = true;
+		let gameCounter = 0;
+
+		// starting rounds of game
+		while (continues) {
+			
+			let indicator = 1;
+			
+			let direction = Keyboard.keyPressed();
+			do plat.go(direction);
+		
+
+			// checking if a circle was hit
+			if (c1.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c1.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c1.hit();
+					do c1.deleteCircle();
+				}
+			}
+			if (c2.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c2.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c2.hit();
+					do c2.deleteCircle();
+				}
+			}
+			if (c3.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c3.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c3.hit();
+					do c3.deleteCircle();
+				}
+			}
+			if (c4.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c4.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c4.hit();
+					do c4.deleteCircle();
+				}
+			}
+			if (c5.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c5.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c5.hit();
+					do c5.deleteCircle();
+				}
+			}
+			if (c6.getHit() = 0) {
+				
+				let indicator = indicator - 1;
+				let leftx = plat.getTopLeftx();
+				let lefty = plat.getTopLefty();
+				if (c6.checkIfHit(leftx, lefty) = 1) {
+					let indicator = indicator + 1;
+					do c6.hit();
+					do c6.deleteCircle();
+				}
+			}
+		
+			//checking if won
+			if (indicator = 1) {
+				do Output.printString("WINNER!");
+				let continues = false;
+			}	
+		}	
+		return;
+	}
+}
+		

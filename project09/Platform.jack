@@ -1,0 +1,117 @@
+
+// this is the "drunk" platform used to hit the circles
+class Platform {
+
+    field int topLeftx, topLefty;
+    field int botRightx, botRighty;
+
+	// constructor 
+	constructor Platform new() {
+ 	let topLeftx = 115;
+ 	let botRightx = 125;
+ 	let topLefty = 215;
+	let botRighty = 225;
+ 	do Screen.setColor(true);
+ 	do Screen.drawRectangle(topLeftx,topLefty,botRightx,botRighty);
+ 	return this;
+	}
+	
+	// deacclocates memeroy
+	method void dispose() {
+	do Memory.deAlloc(this);
+	return;
+	}
+
+	//getting x coordinate of top left part of platform
+	method int getTopLeftx() {
+	return topLeftx;
+	}
+
+	//getting x coordinate of top left part of platform
+	method int getTopLefty() {
+	return topLefty;
+	}
+	// drunk platform moving up.	
+	method void goUp() {
+        	if (topLefty > 5) {
+			if (botRightx > 15) {
+	            	do Screen.setColor(false);
+	            	do Screen.drawRectangle(topLeftx, topLefty, botRightx, botRighty);
+	            	let topLefty = topLefty - 4;
+		    	let topLeftx = topLeftx - 2;
+			let botRighty = botRighty - 4;
+			let botRightx = botRightx - 2;
+	            	do Screen.setColor(true);
+	 	    	do Screen.drawRectangle(topLeftx,topLefty,botRightx,botRighty);
+			}
+		}
+        	return;
+    	}
+	// drunk platform moving down.	
+	method void goDown() {
+        	if (topLefty < 230) {
+			if (botRightx < 230) {
+	            	do Screen.setColor(false);
+	            	do Screen.drawRectangle(topLeftx, topLefty, botRightx, botRighty);
+	            	let topLefty = topLefty + 4;
+		    	let topLeftx = topLeftx + 2;
+			let botRighty = botRighty + 4;
+			let botRightx = botRightx + 2;
+	            	do Screen.setColor(true);
+	 	    	do Screen.drawRectangle(topLeftx,topLefty,botRightx,botRighty);
+			}
+		}
+        	return;
+    	}
+	// drunk platform moving right.
+	method void jumpRight() {
+        	if (topLefty < 230) {
+			if (botRightx < 230) {
+	            	do Screen.setColor(false);
+	            	do Screen.drawRectangle(topLeftx, topLefty, botRightx, botRighty);
+	            	let topLefty = topLefty + 1;
+		    	let topLeftx = topLeftx + 2;
+			let botRighty = botRighty + 1;
+			let botRightx = botRightx + 2;
+	            	do Screen.setColor(true);
+	 	    	do Screen.drawRectangle(topLeftx,topLefty,botRightx,botRighty);
+			}
+		}
+        	return;
+    	}
+	// drunk platform moving left	
+	method void jumpLeft() {
+        	if (topLefty > 3) {
+			if (botRightx > 20) {
+	            	do Screen.setColor(false);
+	            	do Screen.drawRectangle(topLeftx, topLefty, botRightx, botRighty);
+	            	let topLefty = topLefty - 1;
+		    	let topLeftx = topLeftx - 2;
+			let botRighty = botRighty - 1;
+			let botRightx = botRightx - 2;
+	            	do Screen.setColor(true);
+	 	    	do Screen.drawRectangle(topLeftx,topLefty,botRightx,botRighty);
+			}
+		}
+        	return;
+    	}
+	// drunk platform moving
+	method void go(int direction) {
+		if (direction = 133) {
+                	do goDown();
+		}	
+		if (direction = 131) {
+                	do goUp();
+            	}
+		if (direction = 132) {
+                	do jumpRight();
+            	}
+		if (direction = 130) {
+                	do jumpLeft();
+            	}
+		
+            	return;
+	}
+
+}
+

@@ -1,0 +1,24 @@
+alonba, joshm
+===============================================================================
+Alon Bar, ID 201639663, alon.bar2@mail.huji.ac.il
+Josh Mirchin, ID 318142999, josh.mirchin@mail.huji.ac.il
+===============================================================================
+
+                           Project 09 - drunk Circle Game
+                           ----------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Main.jack - main
+Platform.jack - the platform program
+Circle.jack - the Circle class
+CircleGame - manages the game
+
+Remarks
+six circles appear on the board. using the "drunk" square platform
+the user must touch all six squares, once they are touched,
+the circle dissapears. Once all six dissapear, you win.
+the drunkness manifests itseld in the way that the platform 
+moves in a crooked way like a drunkie.

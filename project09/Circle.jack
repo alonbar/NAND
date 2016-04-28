@@ -1,0 +1,55 @@
+// the circle class
+class Circle {
+	field int xcor;
+	field int ycor;
+	field int radius;
+	field int hit;
+
+	// constructor
+	constructor Circle new(int x, int y, int r) {
+		let ycor = y;
+		let xcor = x;
+		let radius = r;
+		let hit = 0;
+ 		do Screen.setColor(true);
+		do Screen.drawCircle(xcor,ycor,r);
+		return this;
+	}
+
+	method int getHit() {
+		return hit;
+	}
+	method void hit() {
+		let hit = 1;
+		return;
+	}
+	
+
+	//erasing circle
+	method void deleteCircle() {
+		do Screen.setColor(false);
+		do Screen.drawCircle(xcor, ycor, radius);
+		return;
+	}
+
+	//deallocating memory for circle Circle
+	method void dispose() {
+		do Memory.deAlloc(this);
+	return;
+	}
+
+	// checking if the circle was hit by the drunk platform
+	method int checkIfHit(int leftx,int  lefty) {
+		if (xcor < (leftx + 11)) {
+			if (xcor > (leftx - 6)) {
+				if (ycor < (lefty + 11)) {
+					if (ycor > (lefty - 6)) {
+						return 1;
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
+}
