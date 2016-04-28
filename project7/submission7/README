@@ -1,0 +1,21 @@
+alonba, joshm
+===============================================================================
+Alon Bar, ID 201639663, alon.bar2@mail.huji.ac.il
+Josh Mirchin, ID 318142999, josh.mirchin@mail.huji.ac.il
+===============================================================================
+
+                           Project 07 - Machine translator
+                           ----------------------- 
+Submitted Files
+---------------
+README 						This file.
+Makefile					makefile
+VMTranslator				entry point
+VMTranslator				entry point for python script - starts the program
+Parser.py					The parser - iterating each vm file, and writing the final results
+CodeWriter.py				Hold all the logic of the code, will receive each line as choose the correct assembly code
+classWriterLogicWriter.py	writes the assebly that is related to larger than, equal or smaller than. in different class for modularity purposes.
+
+Remarks
+-------
+We've already finished project08, so the submission actually contains all of our code for project 8 while we just left the bootstrap commented out.

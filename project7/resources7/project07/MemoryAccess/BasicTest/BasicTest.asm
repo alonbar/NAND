@@ -143,10 +143,11 @@ D = A
 @LCL
 A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @5
@@ -154,10 +155,11 @@ D = A
 @THAT
 A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
@@ -172,10 +174,11 @@ D = A
 @ARG
 A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
@@ -190,10 +193,11 @@ D = A
 @THIS
 A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @6
@@ -201,10 +205,11 @@ D = A
 @THIS
 A = D + M
 A = M
-D = M
+D = A
 @SP
 A = M
 M = D
+D = M
 @SP
 M = M + 1
 @SP
