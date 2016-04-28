@@ -19,9 +19,7 @@ class CompilationEngine:
 
         #getting class decleration
         for i in range(0,3):
-            self._analysis_tokens += [self.get_brackets_start_line(self._tokenizer.get_next_token_type()) + " " +
-                              self._tokenizer.get_next_token_content() + " " +
-                              self.get_brackets_end_line(self._tokenizer.get_next_token_type()) + "\n"]
+            self._analysis_tokens += self.get_next_line()
             self._tokenizer.advance_token_ptr()
 
         #getting var declerations
@@ -31,10 +29,13 @@ class CompilationEngine:
         while self._tokenizer.get_next_token_content()in ["constructor", "function", "method"]:
             self.compile_subroutine()
 
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
         self._analysis_tokens += [self.get_brackets_end_line("class") + "\n"]
 
         for item in self._analysis_tokens:
             output_file.write(item)
+        output_file.close()
 
     def compile_class_var_dec(self):
         self._analysis_tokens += [self.get_brackets_start_line("classVarDec") + "\n"]
@@ -83,21 +84,246 @@ class CompilationEngine:
             self._tokenizer.advance_token_ptr()
         self._analysis_tokens += [self.get_brackets_end_line("parameterList") + "\n"]
 
-
+    #compiling subroutine body
     def compile_subroutine_body(self):
           #getting subroutine body
-        self.get_brackets_start_line("subroutineBody")
+        self._analysis_tokens += [self.get_brackets_start_line("subroutineBody") + "\n"]
 
         #getting "{"
         self._analysis_tokens += self.get_next_line()
         self._tokenizer.advance_token_ptr()
 
         while self._tokenizer.get_next_token_content() == "var":
-            self.
-        self.get_brackets_end_line("subroutineBody")
+            self.compile_var_dec()
 
+        self.compile_statement()
+
+        #get }
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("subroutineBody")  + "\n"]
+
+    #compiling subroutine var declerations
     def compile_var_dec(self):
+        self._analysis_tokens += [self.get_brackets_start_line("varDec") + "\n" ]
 
+        #getting var deceleration
+        while self._tokenizer.get_next_token_content() != ";":
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+
+        #getting ";"
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("varDec") + "\n"]
+
+    #compiling subroutine statements
+    def compile_statement(self):
+        self._analysis_tokens += [self.get_brackets_start_line("statements") + "\n"]
+        statement = self._tokenizer.get_next_token_content()
+        while statement != "}":
+            if statement == "let":
+                self.compile_let()
+            elif statement =="if":
+                self.compile_if()
+            elif statement == "while":
+                self.compile_while()
+            elif statement == "do":
+                self.compile_do()
+            elif statement == "return":
+                self.compile_return()
+            statement = self._tokenizer.get_next_token_content()
+        self._analysis_tokens += [self.get_brackets_end_line("statements") + "\n"]
+
+    def compile_return(self):
+        self._analysis_tokens += [self.get_brackets_start_line("returnStatement") + "\n"]
+        #get return
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        if self._tokenizer.get_next_token_content() != ";":
+            self.compile_expression()
+        #get ;
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("returnStatement") + "\n"]
+
+
+    def compile_do(self):
+        self._analysis_tokens += [self.get_brackets_start_line("doStatement") + "\n"]
+        #get do
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #get the next token after do
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+
+        #get . and the name of function
+        while self._tokenizer.get_next_token_content() == ".":
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+
+        #get (
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+
+        self.compile_expression_list()
+        #get )
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #get ;
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("doStatement") + "\n"]
+
+    def compile_while(self):
+        self._analysis_tokens += [self.get_brackets_start_line("whileStatement") + "\n"]
+        #get while
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #get (
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self.compile_expression()
+        #get )
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #get {
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self.compile_statement()
+        #get }
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("whileStatement") + "\n"]
+
+    def compile_if(self):
+        self._analysis_tokens += [self.get_brackets_start_line("ifStatement") + "\n"]
+        #write if
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #write (
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self.compile_expression()
+        #get )
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        #get {
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self.compile_statement()
+        # get }
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        if self._tokenizer.get_next_token_content() == "else":
+            #write else
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            # write {
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self.compile_statement()
+            #get }
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+
+        self._analysis_tokens += [self.get_brackets_end_line("ifStatement") + "\n"]
+
+    def compile_let(self):
+        self._analysis_tokens += [self.get_brackets_start_line("letStatement") + "\n"]
+        #writing let and the var name
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        if self._tokenizer.get_next_token_content() == "[":
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self.compile_expression()
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+
+        #getting "="
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self.compile_expression()
+        #get ";"
+        self._analysis_tokens += self.get_next_line()
+        self._tokenizer.advance_token_ptr()
+        self._analysis_tokens += [self.get_brackets_end_line("letStatement") + "\n"]
+
+    def compile_expression(self):
+        self._analysis_tokens += [self.get_brackets_start_line("expression") + "\n"]
+        self.compile_term()
+        while self._tokenizer.get_next_token_content() in ["*", "&lt;", "&gt;", "=", "-", "+", "/", "|", "&amp;"]:
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self.compile_term()
+        self._analysis_tokens += [self.get_brackets_end_line("expression") + "\n"]
+
+    def compile_term(self):
+        self._analysis_tokens += [self.get_brackets_start_line("term") + "\n"]
+        if self._tokenizer.get_next_token_content() == "(":
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self.compile_expression()
+            #writing ")"
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+        elif self._tokenizer.get_next_token_content() in ["-", "~"]:
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            self.compile_term()
+        else:
+            #getting the token
+            self._analysis_tokens += self.get_next_line()
+            self._tokenizer.advance_token_ptr()
+            if self._tokenizer.get_next_token_content() == "[":
+                #getting the "["
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+                self.compile_expression()
+                #getting the "]"
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+
+            if self._tokenizer.get_next_token_content() == "(":
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+                self.compile_expression_list()
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+
+            if self._tokenizer.get_next_token_content() == ".":
+                while self._tokenizer.get_next_token_content() == ".":
+                    #write .
+                    self._analysis_tokens += self.get_next_line()
+                    self._tokenizer.advance_token_ptr()
+                    #write method name
+                    self._analysis_tokens += self.get_next_line()
+                    self._tokenizer.advance_token_ptr()
+                #write (
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+                self.compile_expression_list()
+                #write )
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+
+        self._analysis_tokens += [self.get_brackets_end_line("term") + "\n"]
+
+
+    def compile_expression_list(self):
+        self._analysis_tokens += [self.get_brackets_start_line("expressionList") + "\n"]
+        if self._tokenizer.get_next_token_content() != ")":
+            self.compile_expression()
+            while self._tokenizer.get_next_token_content() == ",":
+                self._analysis_tokens += self.get_next_line()
+                self._tokenizer.advance_token_ptr()
+                self.compile_expression()
+        self._analysis_tokens += [self.get_brackets_end_line("expressionList") + "\n"]
 
     def get_next_line(self):
         return [self.get_brackets_start_line(self._tokenizer.get_next_token_type()) + " " +
